@@ -80,54 +80,13 @@ function Snips() {
     navigate(`/snips/${snipId}`);
   }
 
-  //   function onShareSnip(snipId) {
-  //     toast(
-  //       (t) => (
-  //         <div className="flex items-center gap-2">
-  //           <input
-  //             readOnly
-  //             value={`${window.location.origin}/snipflow/snips/${snipId}`}
-  //             className="flex-1 bg-slate-800 border border-gray-600 rounded px-3 py-2 text-sm"
-  //           />
-  //           <button onClick={() => handleShareSnip(snipId)}>Copy</button>
-  //           <div className="flex gap-2 justify-end">
-  //             {/* "No" Button - Just dismisses the toast */}
-  //             <button
-  //               onClick={() => toast.dismiss(t.id)}
-  //               className="px-3! py-1! text-xs! bg-slate-700! hover:bg-slate-600! rounded-md! text-white! transition-colors!"
-  //             >
-  //               Cancel
-  //             </button>
-  //           </div>
-  //         </div>
-  //       ),
-  //       {
-  //         dismiss: true,
-  //         duration: 6000,
-  //         position: "top-right",
-  //         style: {
-  //           background: "#333333",
-  //           border: "1px solid #444",
-  //           padding: "16px",
-  //         },
-  //       }
-  //     );
-  //   }
-
-  //   function handleShareSnip(snipId) {
-  //     const shareUrl = `${window.location.origin}/snipflow/snips/${snipId}`;
-
-  //     navigator.clipboard.writeText(shareUrl);
-  //     toast.success("Shareable link copied to clipboard!");
-  //   }
-
   function onShareSnip(snipId) {
     const shareUrl = `${window.location.origin}/snips/${snipId}`;
 
     const handleCopy = (toastId) => {
       navigator.clipboard.writeText(shareUrl);
       toast.success("Link copied! Share it with others.");
-      toast.dismiss(toastId); // Dismiss the original prompt toast after successful copy
+      toast.dismiss(toastId); 
     };
 
     toast(
@@ -141,16 +100,14 @@ function Snips() {
               className="flex-1 bg-slate-700 border border-gray-600 rounded-md px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
 
-            {/* Copy Button */}
             <button
-              onClick={() => handleCopy(t.id)} // Pass the toast ID to the handler
+              onClick={() => handleCopy(t.id)} 
               className="p-3 bg-blue-600 hover:bg-blue-700 rounded-md text-white transition-colors flex items-center justify-center"
               title="Copy Link"
             >
               <LuCopy size={16} />
             </button>
 
-            {/* Dismiss Button (X icon) */}
             <button
               onClick={() => toast.dismiss(t.id)}
               className="p-2 bg-slate-600 hover:bg-slate-500 rounded-md text-gray-300 hover:text-white transition-colors flex items-center justify-center"
@@ -162,14 +119,14 @@ function Snips() {
         </div>
       ),
       {
-        // Settings for the custom toast container
-        duration: 8000, // Give users more time to see it
+        id:"shareSnip",
+        duration: 8000, 
         position: "top-right",
         style: {
-          background: "#1f2937", // Darker background (slate-800 equivalent)
+          background: "#1f2937", 
           border: "1px solid #4b5563",
           padding: "16px",
-          width: "auto", // Allow width to adjust based on content
+          width: "auto", 
           minWidth: "400px",
         },
       }
@@ -184,7 +141,7 @@ function Snips() {
   }
 
   return (
-    <div className="w-full  min-h-screen px-10 mt-6 mb-8 flex flex-col items-center gap-4">
+    <div className="w-full min-h-screen px-10 mt-6 mb-8 flex flex-col items-center gap-4">
       <div className="relative w-[50%]">
         {/* Search Icon */}
         <FiSearch

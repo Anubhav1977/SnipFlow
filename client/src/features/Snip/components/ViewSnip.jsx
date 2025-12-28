@@ -45,7 +45,7 @@ function ViewSnip() {
           placeholder="Enter Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          disabledF
+          disabled
           className="border border-gray-700 rounded-md cursor-not-allowed px-3 py-2 w-[70%]"
         />
         <button
