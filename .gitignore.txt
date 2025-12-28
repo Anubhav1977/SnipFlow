@@ -1,11 +1,10 @@
-# Node / React
-node_modules/
-dist/
-.env
+# .NET
+server/.vs/
+server/bin/
+server/obj/
 
-# Visual Studio / .NET
-.vs/
-[Bb]in/
-[Oo]bj/
-*.user
-*.suo
+# Node
+node_modules/
+
+# Misc
+.env
