@@ -1,5 +1,5 @@
 # SnipFlow
-![Static Badge](https://img.shields.io/badge/:badgeContent?logo=https%3A%2F%2Fstatic.vecteezy.com%2Fsystem%2Fresources%2Fthumbnails%2F047%2F247%2F494%2Fsmall_2x%2F3d-code-icon-design-illustration-png.png&label=SnipFlow)
+![Static Badge](https://img.shields.io/badge/Project-SnipFlow?style=for-the-badge&logo=codecrafters&label=SnipFlow&labelColor=%231e293b&color=%230ea5e9) ![Static Badge](https://img.shields.io/badge/Full_Stack-Tech_Stack?style=for-the-badge&logo=codecrafters&label=Tech%20Stack&labelColor=%231e293b&color=%238b5cf6) ![Static Badge](https://img.shields.io/badge/Utility-Developer?style=for-the-badge&logo=codecrafters&label=Developer&labelColor=%231e293b&color=%2310b981)
 
 SnipFlow is a full-stack web application designed for developers to create, manage, and share code snippets effortlessly. It features a modern, intuitive interface for writing and organizing code, coupled with a robust backend to store and retrieve data efficiently.
 
