@@ -1,3 +1,4 @@
 export const SLICES = {
-    SNIP: "snip",
+    SNIPS: "snips",
 }
+

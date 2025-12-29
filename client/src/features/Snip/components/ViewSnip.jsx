@@ -3,23 +3,23 @@ import { useEffect, useState } from "react";
 import { javascript } from "@codemirror/lang-javascript";
 import { LuCopy } from "react-icons/lu";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
+import { fetchSnipById } from "../snipThunk";
 
 function ViewSnip() {
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
   const { id: snipId } = useParams();
+  const dispatch = useDispatch();
   //   const [searchParams, setSearchParams] = useSearchParams();
   //   const snipId = searchParams.get("snipId");
-  const snips = useSelector((state) => state.snip.snips);
+  const snip = useSelector((state) => state.snips.selectedSnip);
 
   useEffect(() => {
-    console.log(snipId);
-    console.log(JSON.stringify(snips));
-    if (snipId && snips.length > 0) {
-      const snip = snips.find((s) => s._id === snipId);
+    if (snipId) {
+      dispatch(fetchSnipById(snipId));
 
       if (snip) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -27,7 +27,7 @@ function ViewSnip() {
         setValue(snip.content);
       }
     }
-  }, [snipId, snips]);
+  }, [snipId, snip, dispatch]);
 
   function copyToClipboard() {
     navigator.clipboard.writeText(value);
@@ -36,9 +36,10 @@ function ViewSnip() {
     });
   }
 
+
   return (
     <div className="w-full min-h-screen px-10 mt-6 mb-8 flex flex-col items-center gap-4">
-      <h2 className="text-3xl font-bold">View Snip</h2>
+      <h2 className="text-3xl font-bold">Viewing Snip</h2>
       <div className="w-[60%]  flex justify-center gap-4">
         <input
           type="text"

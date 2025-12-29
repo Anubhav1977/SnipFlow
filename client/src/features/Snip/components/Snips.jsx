@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FaEdit, FaEye } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { FaEye } from "react-icons/fa";
 import { FiSearch } from "react-icons/fi";
 import { GrEdit } from "react-icons/gr";
 import { IoShareSocial } from "react-icons/io5";
@@ -7,15 +7,17 @@ import { LuCopy } from "react-icons/lu";
 import { MdDeleteForever, MdPrivateConnectivity } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import ActionIcon from "../../../shared/components";
-import { CiCalendarDate } from "react-icons/ci";
 import { HiMiniCalendarDateRange } from "react-icons/hi2";
 import toast from "react-hot-toast";
-import { removeSnip } from "../snipSlice";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { deleteSnip, fetchSnips } from "../snipThunk";
+import { MESSAGES } from "../../../constants/messages";
+import Loader from "../../../shared/Loader";
 
 function Snips() {
   const [searchTerm, setSearchTerm] = useState("");
-  const snips = useSelector((state) => state.snip.snips);
+  const snips = useSelector((state) => state.snips.snips);
+  const { status } = useSelector((state) => state.snips.status);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const formatter = new Intl.DateTimeFormat("en-US", {
@@ -23,6 +25,10 @@ function Snips() {
     month: "long",
     day: "numeric",
   });
+
+  useEffect(() => {
+    dispatch(fetchSnips());
+  }, [dispatch, snips]);
 
   const filteredSnips = snips.filter((snip) =>
     snip.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -33,7 +39,9 @@ function Snips() {
   }
 
   const confirmDelete = (id) => {
-    dispatch(removeSnip(id));
+    dispatch(deleteSnip(id))
+      .then(() => toast.success(MESSAGES.SNIP.DELETE_SUCCESS))
+      .catch((err) => toast.error(err));
   };
 
   function onDeleteSnip(snipId) {
@@ -86,7 +94,7 @@ function Snips() {
     const handleCopy = (toastId) => {
       navigator.clipboard.writeText(shareUrl);
       toast.success("Link copied! Share it with others.");
-      toast.dismiss(toastId); 
+      toast.dismiss(toastId);
     };
 
     toast(
@@ -101,7 +109,7 @@ function Snips() {
             />
 
             <button
-              onClick={() => handleCopy(t.id)} 
+              onClick={() => handleCopy(t.id)}
               className="p-3 bg-blue-600 hover:bg-blue-700 rounded-md text-white transition-colors flex items-center justify-center"
               title="Copy Link"
             >
@@ -119,14 +127,14 @@ function Snips() {
         </div>
       ),
       {
-        id:"shareSnip",
-        duration: 8000, 
+        id: "shareSnip",
+        duration: 8000,
         position: "top-right",
         style: {
-          background: "#1f2937", 
+          background: "#1f2937",
           border: "1px solid #4b5563",
           padding: "16px",
-          width: "auto", 
+          width: "auto",
           minWidth: "400px",
         },
       }
@@ -138,6 +146,10 @@ function Snips() {
     toast.success("Copied to clipboard!", {
       id: "clipboard",
     });
+  }
+
+  if (status === "loading") {
+    return <Loader />;
   }
 
   return (
@@ -152,20 +164,22 @@ function Snips() {
         {/* Input */}
         <input
           type="text"
-          placeholder="Search snips..."
+          placeholder="Search snips… before they search you"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full pl-10 pr-4 py-2 border border-gray-700 rounded-md  text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
       <div className="w-[80%] border border-gray-400 rounded-sm  ">
-        <div className="text-start text-3xl font-bold py-6 px-4">All Snips</div>
+        <div className="text-start text-3xl font-bold py-6 px-4">
+          Snippet Library
+        </div>
         <div>
           {filteredSnips.length > 0 ? (
             filteredSnips.map((snip) => {
               return (
                 <div
-                  key={snip._id}
+                  key={snip.id}
                   className="border-t border-gray-400 px-4 py-3 hover:bg-slate-800   text-start"
                 >
                   <div className="flex justify-between items-center">
@@ -189,19 +203,19 @@ function Snips() {
                     <div className="flex gap-4 ">
                       <ActionIcon
                         Icon={GrEdit}
-                        onClick={() => onEditSnip(snip._id)}
+                        onClick={() => onEditSnip(snip.id)}
                       />
                       <ActionIcon
                         Icon={MdDeleteForever}
-                        onClick={() => onDeleteSnip(snip._id)}
+                        onClick={() => onDeleteSnip(snip.id)}
                       />
                       <ActionIcon
                         Icon={FaEye}
-                        onClick={() => onViewSnip(snip._id)}
+                        onClick={() => onViewSnip(snip.id)}
                       />
                       <ActionIcon
                         Icon={IoShareSocial}
-                        onClick={() => onShareSnip(snip._id)}
+                        onClick={() => onShareSnip(snip.id)}
                       />
                       <ActionIcon
                         Icon={LuCopy}

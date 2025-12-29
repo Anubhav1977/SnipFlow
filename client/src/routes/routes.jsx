@@ -4,12 +4,13 @@ import ViewSnip from "../features/Snip/components/ViewSnip";
 import Home from "../features/Snip/components/Home";
 import Snips from "../features/Snip/components/Snips";
 import { ROUTES } from "../constants/routes";
+import NotFound from "../shared/NotFound";
 
 export const routes = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-    errorElement: <div>404 Not Found</div>,
+    errorElement: <NotFound/>,
     children: [
       {
         index: true,

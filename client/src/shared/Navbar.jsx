@@ -1,4 +1,5 @@
 import React from "react";
+import { HiOutlineCodeBracketSquare } from "react-icons/hi2";
 import { NavLink, useNavigate } from "react-router-dom";
 
 function Navbar() {

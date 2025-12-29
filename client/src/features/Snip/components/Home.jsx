@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import ReactCodeMirror from "@uiw/react-codemirror";
 import { useEffect, useState } from "react";
 import { javascript } from "@codemirror/lang-javascript";
@@ -6,7 +7,10 @@ import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import toast from "react-hot-toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addSnip, updateSnip } from "../snipSlice";
+import { MESSAGES } from "../../../constants/messages";
+import { createSnip, fetchSnipById, updateSnip } from "../snipThunk";
+import { clearSelectedSnip } from "../snipSlice";
+import Loader from "../../../shared/Loader";
 
 function Home() {
   const [title, setTitle] = useState("");
@@ -18,7 +22,8 @@ function Home() {
   const snipId = searchParams.get("snipId");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const snips = useSelector((state) => state.snip.snips);
+  const selectedSnip = useSelector((state) => state.snips.selectedSnip);
+  const status = useSelector((state) => state.snips.status);
 
   function copyToClipboard() {
     navigator.clipboard.writeText(value);
@@ -27,62 +32,93 @@ function Home() {
     });
   }
 
-  useEffect(() => {
-    if (snipId && snips.length > 0) {
-      const snip = snips.find((s) => s._id === snipId);
+  function resetForm() {
+    setTitle("");
+    setValue("");
+    setType("code");
+    setVisibility("public");
+    setSearchParams({});
+    setIsLoading(false);
+  }
 
-      if (snip) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setTitle(snip.title);
-        setValue(snip.content);
-        setVisibility(snip.visibility);
-        setType(snip.type);
-      }
+  useEffect(() => {
+    if (snipId) {
+      console.log(snipId);
+      dispatch(fetchSnipById(snipId));
     }
-  }, [snipId, snips]);
+  }, [dispatch, snipId]);
+
+  useEffect(() => {
+    if (selectedSnip) {
+      setTitle(selectedSnip.title);
+      setValue(selectedSnip.content);
+      setVisibility(selectedSnip.visibility);
+      setType(selectedSnip.type);
+    }
+  }, [selectedSnip]);
+
+  useEffect(() => {
+    if (!snipId) {
+      dispatch(clearSelectedSnip());
+      resetForm();
+    }
+  }, [snipId, dispatch, resetForm]);
 
   function handleCreateSnip() {
     setIsLoading(true);
 
-    const normalizedTitle = title.trim().toLowerCase();
-
-    if (normalizedTitle === "" || value.trim() === "") {
-      toast.error("Title and Content are required!");
+    if (!title.trim() || !value.trim()) {
+      toast.error(MESSAGES.SNIP.REQUIRED);
       setIsLoading(false);
       return;
     }
-
-    const duplicateSnip = snips.find(
-      (s) =>
-        s.title.trim().toLowerCase() === normalizedTitle && s._id !== snipId // 🔥 THIS is the key fix
-    );
-
-    if (duplicateSnip) {
-      toast.error("Snip with the same title already exists!");
-      setIsLoading(false);
-      return;
-    }
-
-    const snip = {
-      title: title,
-      content: value,
-      type: type,
-      visibility: visibility,
-      _id: snipId || Date.now().toString(36),
-      createdAt: new Date().toISOString(),
-    };
 
     if (snipId) {
-      dispatch(updateSnip(snip));
-      navigate("/snips");
-    } else {
-      dispatch(addSnip(snip));
-    }
+      const snip = {
+        title: title,
+        content: value,
+        type: type,
+        visibility: visibility,
+        id: snipId,
+      };
 
-    setTitle("");
-    setValue("");
-    setSearchParams({});
-    setIsLoading(false);
+      dispatch(updateSnip({ id: snipId, data: snip }))
+        .then(() => {
+          toast.success(MESSAGES.SNIP.UPDATE_SUCCESS);
+          resetForm();
+          navigate("/snips");
+        })
+        .catch((err) => {
+          toast.error(err);
+          setIsLoading(false);
+          return;
+        });
+    } else {
+      const snip = {
+        title: title,
+        content: value,
+        type: type,
+        visibility: visibility,
+        id: snipId,
+        createdAt: new Date().toISOString(),
+      };
+
+      dispatch(createSnip(snip))
+        .unwrap()
+        .then(() => {
+          toast.success(MESSAGES.SNIP.CREATE_SUCCESS);
+          resetForm();
+        })
+        .catch((err) => {
+          toast.error(err);
+          setIsLoading(false);
+          return;
+        });
+    }
+  }
+
+  if (snipId && status === "loading") {
+    return <Loader />;
   }
 
   return (
@@ -132,7 +168,7 @@ function Home() {
       </div>
       <input
         type="text"
-        placeholder="Enter Title"
+        placeholder="Snip title lives here"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         className="border border-gray-700 rounded-md px-3 py-2 w-[70%]"
@@ -151,6 +187,9 @@ function Home() {
         </div>
         <ReactCodeMirror
           value={value}
+          placeholder={
+            "Start typing your brilliance here… the compiler is listening."
+          }
           height="700px"
           basicSetup={{
             highlightActiveLine: false,

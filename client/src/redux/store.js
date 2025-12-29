@@ -4,6 +4,6 @@ import { SLICES } from "../constants/keys";
 
 export const store = configureStore({
   reducer: {
-    [SLICES.SNIP]: snipReducer,
+    [SLICES.SNIPS]: snipReducer,
   },
 });
